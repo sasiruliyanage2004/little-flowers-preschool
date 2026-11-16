@@ -32,6 +32,8 @@ export const Navbar: React.FC = () => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  const isHeroTransparent = pathname === '/' && !isScrolled;
+
   const navLinks = [
     { href: '/', label: t.nav.home },
     { href: '/about', label: t.nav.about },
@@ -46,13 +48,15 @@ export const Navbar: React.FC = () => {
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         isScrolled
           ? 'bg-cream/95 backdrop-blur-md py-3 shadow-sm border-b border-charcoal/5'
-          : 'bg-cream/70 backdrop-blur-sm py-4 md:py-5'
+          : isHeroTransparent
+          ? 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-4 md:py-5 border-b-0'
+          : 'bg-cream/90 backdrop-blur-sm py-4 md:py-5 border-b border-charcoal/5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Logo size="md" />
+          <Logo size="md" isWhite={isHeroTransparent} />
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
@@ -65,6 +69,8 @@ export const Navbar: React.FC = () => {
                   className={`px-3.5 py-2 rounded-full text-sm font-heading font-medium transition-all duration-200 ${
                     isActive
                       ? 'bg-coral text-white shadow-sm'
+                      : isHeroTransparent
+                      ? 'text-white/90 hover:text-white hover:bg-white/20'
                       : 'text-charcoal-light hover:text-charcoal hover:bg-white/80'
                   }`}
                 >
@@ -80,11 +86,15 @@ export const Navbar: React.FC = () => {
 
             <a
               href={`tel:${schoolInfo.contact.phone}`}
-              className="p-2.5 rounded-full bg-white text-charcoal hover:text-coral border border-charcoal/10 shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95"
+              className={`p-2.5 rounded-full border shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95 ${
+                isHeroTransparent
+                  ? 'bg-white/15 text-white hover:bg-white/25 border-white/25'
+                  : 'bg-white text-charcoal hover:text-coral border-charcoal/10'
+              }`}
               aria-label="Call Little Flowers Preschool"
               title={schoolInfo.contact.phoneDisplay}
             >
-              <Phone className="w-4 h-4 text-coral" />
+              <Phone className={`w-4 h-4 ${isHeroTransparent ? 'text-yellow-sunshine' : 'text-coral'}`} />
             </a>
 
             <Link
@@ -102,11 +112,19 @@ export const Navbar: React.FC = () => {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-2xl bg-white text-charcoal border border-charcoal/10 shadow-sm focus:outline-none"
+              className={`p-2.5 rounded-2xl border shadow-sm focus:outline-none ${
+                isHeroTransparent
+                  ? 'bg-white/15 text-white border-white/25'
+                  : 'bg-white text-charcoal border-charcoal/10'
+              }`}
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6 text-coral" /> : <Menu className="w-6 h-6 text-charcoal" />}
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6 text-coral" />
+              ) : (
+                <Menu className={`w-6 h-6 ${isHeroTransparent ? 'text-white' : 'text-charcoal'}`} />
+              )}
             </button>
           </div>
         </div>

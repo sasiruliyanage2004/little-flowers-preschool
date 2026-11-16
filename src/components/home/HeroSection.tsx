@@ -1,239 +1,254 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Sparkles, ArrowRight, Play, Heart, ShieldCheck, SunMedium } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  ArrowRight,
+  HeartHandshake,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+} from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { FloatingPetals } from '@/components/ui/FloatingPetals';
 import { FlowerIcon, DaisyIcon } from '@/components/ui/FlowerDeco';
 
 export const HeroSection: React.FC = () => {
   const { t, isSinhala } = useLanguage();
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const prefersReducedMotion = useReducedMotion();
+
+  const toggleSound = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const scrollToNext = () => {
+    const el = document.getElementById('established');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' });
+    }
+  };
 
   return (
-    <section className="relative min-h-[92vh] lg:min-h-screen pt-28 pb-16 lg:pt-36 lg:pb-24 flex items-center bg-cream overflow-hidden">
-      {/* Decorative Floating Petals */}
-      <FloatingPetals />
+    <section className="relative w-full h-[100svh] min-h-[640px] flex items-center justify-start overflow-hidden bg-charcoal">
+      {/* 1. Fullscreen Cinematic Background Video / Reduced-Motion Poster */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+        {prefersReducedMotion ? (
+          <Image
+            src="/images/hero-video-poster.jpg"
+            alt="Little Flowers Preschool children running happily together across courtyard in Makola"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center pointer-events-none"
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            preload="metadata"
+            poster="/images/hero-video-poster.jpg"
+            className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
+          >
+            <source src="/videos/hero-seamless-loop.webm" type="video/webm" />
+            <source src="/videos/hero-seamless-loop.mp4" type="video/mp4" />
+            <source src="/videos/hero-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
+            {/* Fallback image */}
+            <Image
+              src="/images/hero-video-poster.jpg"
+              alt="Little Flowers Preschool children running in courtyard"
+              fill
+              priority
+              className="object-cover object-center"
+            />
+          </video>
+        )}
+      </div>
 
-      {/* Soft Pastel Background Blobs */}
-      <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-pink-soft/50 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 -right-24 w-96 h-96 rounded-full bg-yellow-sunshine/30 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 left-1/3 w-96 h-96 rounded-full bg-mint-soft/40 blur-3xl pointer-events-none" />
+      {/* 2. Carefully Balanced Scrim Overlay for Perfect Typography Readability */}
+      {/* Horizontal gradient: richer dark on left where text lives, translucent on right where children run */}
+      <div className="absolute inset-0 bg-gradient-to-r from-charcoal/95 via-charcoal/75 to-charcoal/25 sm:via-charcoal/65 sm:to-charcoal/15 pointer-events-none z-10" />
+      {/* Vertical gradient: top for navbar contrast and bottom for smooth bleed into page */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/75 pointer-events-none z-10" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          {/* Left Text Column */}
-          <div className="lg:col-span-7 flex flex-col items-start">
-            {/* Heritage Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/90 border border-charcoal/10 shadow-sm mb-6 backdrop-blur-md transform hover:scale-105 transition-transform duration-200">
-              <span className="w-2.5 h-2.5 rounded-full bg-coral animate-pulse" />
-              <span className="text-xs sm:text-sm font-heading font-bold text-charcoal">
-                {t.hero.estBadge}
-              </span>
-            </div>
-
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-heading font-extrabold text-charcoal tracking-tight leading-[1.12]">
-              {isSinhala ? (
-                <span className="font-sinhala">{t.hero.headline}</span>
-              ) : (
-                <>
-                  Little Hearts,{' '}
-                  <span className="relative inline-block text-coral">
-                    Big Dreams.
-                    <svg
-                      className="absolute -bottom-2 left-0 w-full h-3 text-yellow-sunshine"
-                      viewBox="0 0 100 20"
-                      preserveAspectRatio="none"
-                    >
-                      <path
-                        d="M0 10 Q 50 20, 100 10"
-                        stroke="currentColor"
-                        strokeWidth="6"
-                        fill="none"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </span>
-                </>
-              )}
-            </h1>
-
-            {/* Supporting Headline */}
-            <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl font-heading font-bold text-coral-dark/90 leading-snug">
-              {t.hero.subheadline}
-            </h2>
-
-            {/* Description */}
-            <p className="mt-5 text-base sm:text-lg lg:text-xl text-charcoal-light font-body leading-relaxed max-w-2xl">
-              {t.hero.description}
-            </p>
-
-            {/* Action Buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-4 w-full sm:w-auto">
-              <Link
-                href="/admissions"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-coral text-white font-heading font-bold text-base shadow-lg shadow-coral/30 hover:bg-coral-dark hover:shadow-xl hover:shadow-coral/40 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                <span>{t.hero.secondaryCta}</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-
-              <Link
-                href="/about"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white text-charcoal font-heading font-bold text-base border-2 border-charcoal/10 hover:border-coral/40 hover:bg-cream-50 shadow-sm transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                <span>{t.hero.primaryCta}</span>
-              </Link>
-            </div>
-
-            {/* Authentic Video Play Trigger */}
-            <div className="mt-8 flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setIsVideoModalOpen(true)}
-                className="group flex items-center gap-3 text-left focus:outline-none"
-              >
-                <div className="w-12 h-12 rounded-full bg-yellow-sunshine flex items-center justify-center text-charcoal shadow-md group-hover:scale-110 group-hover:bg-yellow-dark transition-all duration-200">
-                  <Play className="w-5 h-5 fill-charcoal text-charcoal ml-0.5" />
-                </div>
-                <div>
-                  <span className="block text-xs uppercase font-bold tracking-wider text-charcoal-muted">
-                    {t.videoShowcase.videoBadge}
-                  </span>
-                  <span className="block text-sm font-heading font-bold text-charcoal group-hover:text-coral transition-colors">
-                    {t.hero.watchVideo}
-                  </span>
-                </div>
-              </button>
-            </div>
-
-            {/* Quick Trust Highlights */}
-            <div className="mt-10 pt-8 border-t border-charcoal/10 grid grid-cols-3 gap-4 w-full max-w-xl">
-              <div className="flex items-center gap-2">
-                <Heart className="w-5 h-5 text-coral shrink-0" />
-                <span className="text-xs sm:text-sm font-heading font-semibold text-charcoal">
-                  {t.hero.floatingTag1}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <SunMedium className="w-5 h-5 text-yellow-dark shrink-0" />
-                <span className="text-xs sm:text-sm font-heading font-semibold text-charcoal">
-                  {t.hero.floatingTag2}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-                <span className="text-xs sm:text-sm font-heading font-semibold text-charcoal">
-                  {t.hero.floatingTag3}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Visual Composition - Authentic Preschool Photos */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto max-w-lg lg:max-w-none">
-              {/* Decorative Floral Badges */}
-              <div className="absolute -top-6 -left-6 z-20 hidden sm:block animate-float-slow">
-                <div className="bg-white p-3 rounded-2xl shadow-lg border border-charcoal/5 flex items-center gap-2">
-                  <DaisyIcon size={32} color="#F28B78" />
-                  <div>
-                    <span className="block text-[10px] font-bold uppercase text-charcoal-muted">Established</span>
-                    <span className="block text-xs font-bold text-charcoal">2010 • Makola</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Prominent Photo: Happy Children Running in Courtyard */}
-              <div className="relative rounded-4xl sm:rounded-5xl overflow-hidden shadow-2xl border-4 sm:border-8 border-white bg-white aspect-[4/3] group">
-                <Image
-                  src="/images/opt-preschool-activity-banner.jpg"
-                  alt="Little Flowers Preschool children running happily together across the school courtyard in Makola"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent opacity-80" />
-                
-                {/* Photo Caption Badge */}
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-coral/90 text-[11px] font-bold uppercase tracking-wider mb-1">
-                    Joyful Play
-                  </span>
-                  <p className="text-xs sm:text-sm font-medium drop-shadow-md">
-                    {isSinhala ? 'සිනහවෙන් පිරි පෙරපාසල් ළමා කාලය' : 'Authentic childhood happiness at Little Flowers'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Overlapping Secondary Photo: Children in Uniform at Classroom Entrance */}
-              <div className="absolute -bottom-8 -right-4 sm:-bottom-10 sm:-right-8 w-44 sm:w-56 aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-white z-20 transform rotate-2 hover:rotate-0 transition-transform duration-300">
-                <Image
-                  src="/images/opt-children-play-smiles.jpg"
-                  alt="Students in official Little Flowers Preschool uniform smiling outside classroom"
-                  fill
-                  sizes="(max-width: 768px) 180px, 240px"
-                  className="object-cover object-top hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute bottom-2 left-2 right-2 px-2 py-1 bg-charcoal/80 backdrop-blur-sm rounded-xl text-white text-[10px] font-bold text-center">
-                  {isSinhala ? 'අපේ දූ දරුවන්' : 'Official Uniform'}
-                </div>
-              </div>
-
-              {/* Decorative Playful Flower */}
-              <div className="absolute -bottom-6 left-6 z-20">
-                <FlowerIcon size={42} color="#FFD66B" className="drop-shadow-md animate-gentle-spin" />
-              </div>
-            </div>
-          </div>
+      {/* 3. Subtle Organic Floating Flower Elements (Periphery Only) */}
+      <div
+        className="absolute inset-0 pointer-events-none overflow-hidden z-15 select-none"
+        aria-hidden="true"
+      >
+        <div className="absolute top-[20%] right-[6%] opacity-30 animate-float-slow hidden sm:block">
+          <DaisyIcon size={34} color="#FFD66B" />
+        </div>
+        <div className="absolute bottom-[22%] right-[10%] opacity-25 animate-float-medium hidden lg:block">
+          <FlowerIcon size={30} color="#F28B78" />
+        </div>
+        <div className="absolute top-[35%] left-[2%] opacity-15 animate-float-reverse hidden sm:block">
+          <FlowerIcon size={26} color="#CBE8D5" />
         </div>
       </div>
 
-      {/* Video Modal */}
-      {isVideoModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
-          onClick={() => setIsVideoModalOpen(false)}
-        >
-          <div
-            className="relative max-w-4xl w-full bg-charcoal rounded-3xl overflow-hidden shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
+      {/* 4. Left-Aligned Editorial Content with Staggered Entrance Animations */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full pt-16 sm:pt-20">
+        <div className="max-w-2xl lg:max-w-3xl flex flex-col items-start text-left">
+          {/* Badge: Brand Name & Established 2010 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 shadow-md mb-5 sm:mb-6"
           >
-            <div className="relative aspect-video w-full bg-black">
-              <video
-                src="/videos/preschool-children-running.mp4"
-                controls
-                autoPlay
-                playsInline
-                className="w-full h-full object-contain"
-                poster="/images/opt-preschool-activity-banner.jpg"
-              />
-            </div>
-            <div className="p-4 sm:p-6 bg-charcoal text-white flex items-center justify-between">
-              <div>
-                <h3 className="font-heading font-bold text-lg text-yellow-sunshine">
-                  {t.videoShowcase.headline}
-                </h3>
-                <p className="text-xs sm:text-sm text-white/70">
-                  {t.videoShowcase.subhead}
-                </p>
-              </div>
-              <button
-                onClick={() => setIsVideoModalOpen(false)}
-                className="px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 text-white text-sm font-semibold transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+            <span className="w-2.5 h-2.5 rounded-full bg-yellow-sunshine animate-pulse shrink-0" />
+            <span className="text-xs sm:text-sm font-heading font-extrabold uppercase tracking-widest text-white">
+              {isSinhala
+                ? 'ලිට්ල් ෆ්ලවර්ස් පෙර පාසල • EST. 2010'
+                : 'LITTLE FLOWERS PRESCHOOL • EST. 2010'}
+            </span>
+          </motion.div>
+
+          {/* Main Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.25 }}
+            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-heading font-extrabold text-white tracking-tight leading-[1.12] drop-shadow-lg"
+          >
+            {isSinhala ? (
+              <span className="font-sinhala leading-normal">
+                {t.hero.headline}
+              </span>
+            ) : (
+              <>
+                Little Hearts,{' '}
+                <span className="text-yellow-sunshine relative inline-block">
+                  Big Dreams.
+                  <svg
+                    className="absolute -bottom-2 left-0 w-full h-3 text-coral"
+                    viewBox="0 0 100 20"
+                    preserveAspectRatio="none"
+                  >
+                    <path
+                      d="M0 10 Q 50 20, 100 10"
+                      stroke="currentColor"
+                      strokeWidth="6"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+              </>
+            )}
+          </motion.h1>
+
+          {/* Supporting Headline */}
+          <motion.h2
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+            className="mt-4 sm:mt-5 text-xl sm:text-2xl lg:text-3xl font-heading font-bold text-coral-light leading-snug drop-shadow-md"
+          >
+            {t.hero.subheadline}
+          </motion.h2>
+
+          {/* Emotional Description */}
+          <motion.p
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.55 }}
+            className="mt-4 sm:mt-5 text-base sm:text-lg lg:text-xl text-white/90 font-body leading-relaxed max-w-2xl drop-shadow"
+          >
+            {t.hero.description}
+          </motion.p>
+
+          {/* Action Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.7 }}
+            className="mt-8 sm:mt-10 flex flex-wrap items-center gap-4 w-full sm:w-auto"
+          >
+            <Link
+              href="/admissions"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-coral text-white font-heading font-bold text-base shadow-xl shadow-coral/40 hover:bg-coral-dark hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <HeartHandshake className="w-5 h-5" />
+              <span>{isSinhala ? 'ඇතුළත් කිරීම් විමසන්න' : 'Enquire Now'}</span>
+              <ArrowRight className="w-5 h-5 ml-1" />
+            </Link>
+
+            <button
+              onClick={scrollToNext}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white/15 backdrop-blur-md text-white font-heading font-bold text-base border-2 border-white/40 hover:bg-white/25 hover:border-white shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <span>{isSinhala ? 'අපේ පෙරපාසල හඳුනාගන්න' : 'Discover Our Preschool'}</span>
+            </button>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* 5. Unobtrusive Video Playback & Sound Control (Bottom-Right) */}
+      {!prefersReducedMotion && (
+        <div className="absolute bottom-6 right-6 z-20 hidden sm:flex items-center gap-2.5 bg-black/45 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/15 text-white/80 text-xs shadow-lg">
+          <button
+            onClick={toggleSound}
+            aria-label={isMuted ? 'Unmute video audio' : 'Mute video audio'}
+            className="hover:text-white transition-colors"
+            title={isMuted ? 'Unmute' : 'Mute'}
+          >
+            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-yellow-sunshine" />}
+          </button>
+          <span className="w-px h-3 bg-white/25" />
+          <button
+            onClick={togglePlay}
+            aria-label={isPlaying ? 'Pause background video' : 'Play background video'}
+            className="hover:text-white transition-colors"
+            title={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+          </button>
         </div>
       )}
+
+      {/* 6. Elegant Scroll-Down Indicator (Bottom-Center) */}
+      <div className="absolute bottom-5 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center">
+        <button
+          onClick={scrollToNext}
+          className="group flex flex-col items-center gap-2 text-white/75 hover:text-white transition-colors focus:outline-none"
+          aria-label="Scroll down to explore"
+        >
+          <span className="text-[10px] sm:text-[11px] font-heading font-bold uppercase tracking-widest text-white/70 group-hover:text-white transition-colors drop-shadow">
+            {isSinhala ? 'පහළට යන්න' : 'Scroll to explore'}
+          </span>
+          <div className="w-5 sm:w-6 h-9 sm:h-10 rounded-full border-2 border-white/40 flex items-start justify-center p-1 group-hover:border-white transition-colors shadow-sm">
+            <motion.div
+              animate={{ y: [0, 14, 0] }}
+              transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+              className="w-1.5 h-2 rounded-full bg-yellow-sunshine"
+            />
+          </div>
+        </button>
+      </div>
     </section>
   );
 };

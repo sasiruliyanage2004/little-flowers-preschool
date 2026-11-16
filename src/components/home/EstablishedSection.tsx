@@ -10,7 +10,7 @@ export const EstablishedSection: React.FC = () => {
   const { t, isSinhala } = useLanguage();
 
   return (
-    <section className="py-20 lg:py-28 bg-white relative overflow-hidden">
+    <section id="established" className="py-20 lg:py-28 bg-white relative overflow-hidden">
       {/* Subtle background pastel elements */}
       <div className="absolute top-0 right-0 w-80 h-80 bg-cream rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-mint-soft/30 rounded-full blur-3xl pointer-events-none" />
