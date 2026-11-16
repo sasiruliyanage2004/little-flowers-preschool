@@ -25,6 +25,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const savedLang = localStorage.getItem(STORAGE_KEY) as Language | null;
       if (savedLang === 'en' || savedLang === 'si') {
         setLanguageState(savedLang);
+        if (typeof document !== 'undefined') {
+          document.documentElement.lang = savedLang;
+        }
       }
     } catch {
       // localStorage unavailable or restricted

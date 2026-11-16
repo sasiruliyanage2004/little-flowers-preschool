@@ -71,6 +71,16 @@ export const metadata: Metadata = {
     locale: 'en_LK',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Little Flowers Preschool | Makola, Sri Lanka (Est. 2010)',
+    description:
+      'Growing together with love, learning and happiness since 2010 in Makola South under the guidance of Mrs. Indrani Wettasinghe.',
+    images: ['/images/hero-running-children.jpg'],
+  },
+  alternates: {
+    canonical: 'https://little-flowers-preschool.vercel.app',
+  },
   icons: {
     icon: '/favicon.ico',
   },
@@ -83,9 +93,11 @@ export default function RootLayout({
 }) {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Preschool',
+    '@type': ['Preschool', 'EducationalOrganization', 'ChildCare'],
     name: 'Little Flowers Preschool',
     alternateName: 'ලිට්ල් ෆ්ලවර්ස් පෙර පාසල',
+    description:
+      'Established in 2010 in Makola South, Sri Lanka. Nurturing young minds through holistic play, love, and early childhood education under the leadership of Mrs. Indrani Wettasinghe.',
     foundingDate: '2010',
     address: {
       '@type': 'PostalAddress',
@@ -95,7 +107,8 @@ export default function RootLayout({
       addressCountry: 'LK',
     },
     telephone: '+94719606126',
-    url: 'https://littleflowerspreschool.lk',
+    url: 'https://little-flowers-preschool.vercel.app',
+    image: 'https://little-flowers-preschool.vercel.app/images/hero-running-children.jpg',
     sameAs: [
       'https://youtube.com/@littleflowerspreschool3677',
       'https://share.google/v0ygYpIB2YPst12Nd',

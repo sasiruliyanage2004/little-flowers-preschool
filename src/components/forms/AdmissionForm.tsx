@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Send, CheckCircle2, AlertCircle, Phone, MessageCircle, Mail, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { AdmissionFormValues } from '@/types';
-import { schoolInfo } from '@/data/siteContent';
 
 export const AdmissionForm: React.FC = () => {
   const { t, isSinhala } = useLanguage();
@@ -25,6 +24,7 @@ export const AdmissionForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof AdmissionFormValues, string>>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionId, setSubmissionId] = useState<string>('');
@@ -43,7 +43,6 @@ export const AdmissionForm: React.FC = () => {
         ? 'සම්බන්ධතා දුරකථන අංකය ඇතුළත් කිරීම අනිවාර්යයි.'
         : 'Contact phone number is required.';
     } else {
-      // Basic phone check (allowing Sri Lankan 10 digit, +94, or standard phone characters)
       const cleanPhone = values.contactNumber.replace(/[\s-]/g, '');
       if (cleanPhone.length < 9 || cleanPhone.length > 15) {
         newErrors.contactNumber = isSinhala
@@ -65,32 +64,69 @@ export const AdmissionForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
+
     if (!validate()) return;
 
     setIsSubmitting(true);
 
-    // Simulate reliable local storage logging & verification
-    setTimeout(() => {
-      const newId = `ENQ-${Date.now().toString().slice(-6)}`;
-      setSubmissionId(newId);
+    try {
+      const res = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
 
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSubmissionId(data.referenceId || `ENQ-${Date.now().toString().slice(-6)}`);
+        // Also persist locally for parent reference
+        try {
+          const stored = JSON.parse(localStorage.getItem('little_flowers_enquiries') || '[]');
+          stored.push({
+            id: data.referenceId,
+            ...values,
+            submittedAt: new Date().toISOString(),
+          });
+          localStorage.setItem('little_flowers_enquiries', JSON.stringify(stored));
+        } catch {
+          // Local storage silent fallback
+        }
+        setIsSubmitted(true);
+      } else {
+        // Fallback for offline or rate limit
+        if (res.status === 429) {
+          setServerError(
+            isSinhala
+              ? 'ඉල්ලීම් සංඛ්‍යාව අධිකයි. කරුණාකර සුළු මොහොතකින් නැවත උත්සාහ කරන්න.'
+              : 'Too many requests. Please wait a moment before submitting again.'
+          );
+        } else {
+          setServerError(data.error || 'Submission failed. Please try again.');
+        }
+      }
+    } catch {
+      // Network failure fallback: still record locally and allow user to submit via WhatsApp
+      const fallbackId = `ENQ-${Date.now().toString().slice(-6)}`;
+      setSubmissionId(fallbackId);
       try {
         const stored = JSON.parse(localStorage.getItem('little_flowers_enquiries') || '[]');
         stored.push({
-          id: newId,
+          id: fallbackId,
           ...values,
           submittedAt: new Date().toISOString(),
         });
         localStorage.setItem('little_flowers_enquiries', JSON.stringify(stored));
       } catch {
-        // storage fallback
+        // ignore
       }
-
-      setIsSubmitting(false);
       setIsSubmitted(true);
-    }, 800);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -105,12 +141,17 @@ export const AdmissionForm: React.FC = () => {
       message: '',
     });
     setErrors({});
+    setServerError(null);
     setIsSubmitted(false);
   };
 
   if (isSubmitted) {
     return (
-      <div className="bg-white rounded-4xl p-8 sm:p-10 border border-charcoal/10 shadow-xl text-center max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-300">
+      <div
+        role="region"
+        aria-live="polite"
+        className="bg-white rounded-4xl p-8 sm:p-10 border border-charcoal/10 shadow-xl text-center max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-300"
+      >
         <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10" />
         </div>
@@ -141,7 +182,7 @@ export const AdmissionForm: React.FC = () => {
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-sm shadow-md transition-all transform hover:scale-105 active:scale-95"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-sm shadow-md transition-all transform hover:scale-105 active:scale-95 min-h-[44px]"
           >
             <MessageCircle className="w-4 h-4" />
             <span>{isSinhala ? 'WhatsApp ඔස්සේ තහවුරු කරන්න' : 'Confirm via WhatsApp'}</span>
@@ -150,7 +191,7 @@ export const AdmissionForm: React.FC = () => {
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-cream text-charcoal hover:bg-cream-100 font-heading font-bold text-sm border border-charcoal/10 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-cream text-charcoal hover:bg-cream-100 font-heading font-bold text-sm border border-charcoal/10 transition-colors min-h-[44px]"
           >
             <RotateCcw className="w-4 h-4" />
             <span>{f.submitAnother}</span>
@@ -165,25 +206,42 @@ export const AdmissionForm: React.FC = () => {
       onSubmit={handleSubmit}
       noValidate
       className="bg-white rounded-4xl p-6 sm:p-10 border border-charcoal/10 shadow-xl max-w-2xl mx-auto"
+      aria-label={isSinhala ? 'පෙරපාසල් ඇතුළත් කිරීම් අයදුම්පත' : 'Preschool Admission Enquiry Form'}
     >
+      {serverError && (
+        <div
+          role="alert"
+          className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-3"
+        >
+          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
+          <span>{serverError}</span>
+        </div>
+      )}
+
       <div className="space-y-6">
         {/* Parent Name */}
         <div>
-          <label className="block text-sm font-heading font-bold text-charcoal mb-2">
+          <label htmlFor="adm-parent-name" className="block text-sm font-heading font-bold text-charcoal mb-2">
             {f.parentName} <span className="text-coral">*</span>
           </label>
           <input
+            id="adm-parent-name"
+            name="parentName"
             type="text"
+            required
+            autoComplete="name"
             value={values.parentName}
             onChange={(e) => setValues({ ...values, parentName: e.target.value })}
             placeholder={f.parentNamePlaceholder}
+            aria-invalid={!!errors.parentName}
+            aria-describedby={errors.parentName ? 'parent-name-error' : undefined}
             className={`w-full px-4 py-3 rounded-2xl border text-sm font-body bg-cream-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-coral/40 transition-all ${
               errors.parentName ? 'border-red-400 bg-red-50/30' : 'border-charcoal/15'
             }`}
           />
           {errors.parentName && (
-            <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1 font-medium">
-              <AlertCircle className="w-3.5 h-3.5" />
+            <p id="parent-name-error" className="mt-1.5 text-xs text-red-500 flex items-center gap-1 font-medium">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               <span>{errors.parentName}</span>
             </p>
           )}
@@ -192,42 +250,53 @@ export const AdmissionForm: React.FC = () => {
         {/* Contact Phone & Email Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-heading font-bold text-charcoal mb-2">
+            <label htmlFor="adm-contact-number" className="block text-sm font-heading font-bold text-charcoal mb-2">
               {f.contactNumber} <span className="text-coral">*</span>
             </label>
             <input
+              id="adm-contact-number"
+              name="contactNumber"
               type="tel"
+              required
+              autoComplete="tel"
               value={values.contactNumber}
               onChange={(e) => setValues({ ...values, contactNumber: e.target.value })}
               placeholder={f.contactNumberPlaceholder}
+              aria-invalid={!!errors.contactNumber}
+              aria-describedby={errors.contactNumber ? 'contact-number-error' : undefined}
               className={`w-full px-4 py-3 rounded-2xl border text-sm font-body bg-cream-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-coral/40 transition-all ${
                 errors.contactNumber ? 'border-red-400 bg-red-50/30' : 'border-charcoal/15'
               }`}
             />
             {errors.contactNumber && (
-              <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1 font-medium">
-                <AlertCircle className="w-3.5 h-3.5" />
+              <p id="contact-number-error" className="mt-1.5 text-xs text-red-500 flex items-center gap-1 font-medium">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>{errors.contactNumber}</span>
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-heading font-bold text-charcoal mb-2">
+            <label htmlFor="adm-email" className="block text-sm font-heading font-bold text-charcoal mb-2">
               {f.email}
             </label>
             <input
+              id="adm-email"
+              name="email"
               type="email"
+              autoComplete="email"
               value={values.email}
               onChange={(e) => setValues({ ...values, email: e.target.value })}
               placeholder={f.emailPlaceholder}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? 'email-error' : undefined}
               className={`w-full px-4 py-3 rounded-2xl border text-sm font-body bg-cream-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-coral/40 transition-all ${
                 errors.email ? 'border-red-400 bg-red-50/30' : 'border-charcoal/15'
               }`}
             />
             {errors.email && (
-              <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1 font-medium">
-                <AlertCircle className="w-3.5 h-3.5" />
+              <p id="email-error" className="mt-1.5 text-xs text-red-500 flex items-center gap-1 font-medium">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>{errors.email}</span>
               </p>
             )}
@@ -237,10 +306,12 @@ export const AdmissionForm: React.FC = () => {
         {/* Child's Name & Age */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-heading font-bold text-charcoal mb-2">
+            <label htmlFor="adm-child-name" className="block text-sm font-heading font-bold text-charcoal mb-2">
               {f.childName}
             </label>
             <input
+              id="adm-child-name"
+              name="childName"
               type="text"
               value={values.childName}
               onChange={(e) => setValues({ ...values, childName: e.target.value })}
@@ -250,10 +321,12 @@ export const AdmissionForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-heading font-bold text-charcoal mb-2">
+            <label htmlFor="adm-child-age" className="block text-sm font-heading font-bold text-charcoal mb-2">
               {f.childAge}
             </label>
             <input
+              id="adm-child-age"
+              name="childAge"
               type="text"
               value={values.childAge}
               onChange={(e) => setValues({ ...values, childAge: e.target.value })}
@@ -266,10 +339,12 @@ export const AdmissionForm: React.FC = () => {
         {/* Admission Year & Contact Method */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-heading font-bold text-charcoal mb-2">
+            <label htmlFor="adm-desired-year" className="block text-sm font-heading font-bold text-charcoal mb-2">
               {f.desiredYear}
             </label>
             <select
+              id="adm-desired-year"
+              name="desiredYear"
               value={values.desiredYear}
               onChange={(e) => setValues({ ...values, desiredYear: e.target.value })}
               className="w-full px-4 py-3 rounded-2xl border border-charcoal/15 text-sm font-heading font-semibold text-charcoal bg-cream-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-coral/40 transition-all"
@@ -283,58 +358,62 @@ export const AdmissionForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-heading font-bold text-charcoal mb-2">
-              {f.preferredContact}
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => setValues({ ...values, preferredContact: 'phone' })}
-                className={`py-2.5 px-2 rounded-xl text-xs font-heading font-bold flex flex-col items-center justify-center gap-1 border transition-all ${
-                  values.preferredContact === 'phone'
-                    ? 'bg-coral text-white border-coral shadow-sm'
-                    : 'bg-cream-50 text-charcoal-light border-charcoal/10 hover:bg-cream-100'
-                }`}
-              >
-                <Phone className="w-3.5 h-3.5" />
-                <span>{isSinhala ? 'ඇමතුම්' : 'Phone'}</span>
-              </button>
+            <fieldset>
+              <legend className="block text-sm font-heading font-bold text-charcoal mb-2">
+                {f.preferredContact}
+              </legend>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setValues({ ...values, preferredContact: 'phone' })}
+                  className={`py-2.5 px-2 rounded-xl text-xs font-heading font-bold flex flex-col items-center justify-center gap-1 border transition-all min-h-[44px] ${
+                    values.preferredContact === 'phone'
+                      ? 'bg-coral text-white border-coral shadow-sm'
+                      : 'bg-cream-50 text-charcoal-light border-charcoal/10 hover:bg-cream-100'
+                  }`}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>{isSinhala ? 'ඇමතුම්' : 'Phone'}</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setValues({ ...values, preferredContact: 'whatsapp' })}
-                className={`py-2.5 px-2 rounded-xl text-xs font-heading font-bold flex flex-col items-center justify-center gap-1 border transition-all ${
-                  values.preferredContact === 'whatsapp'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                    : 'bg-cream-50 text-charcoal-light border-charcoal/10 hover:bg-cream-100'
-                }`}
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>WhatsApp</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setValues({ ...values, preferredContact: 'whatsapp' })}
+                  className={`py-2.5 px-2 rounded-xl text-xs font-heading font-bold flex flex-col items-center justify-center gap-1 border transition-all min-h-[44px] ${
+                    values.preferredContact === 'whatsapp'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                      : 'bg-cream-50 text-charcoal-light border-charcoal/10 hover:bg-cream-100'
+                  }`}
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>WhatsApp</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setValues({ ...values, preferredContact: 'email' })}
-                className={`py-2.5 px-2 rounded-xl text-xs font-heading font-bold flex flex-col items-center justify-center gap-1 border transition-all ${
-                  values.preferredContact === 'email'
-                    ? 'bg-coral text-white border-coral shadow-sm'
-                    : 'bg-cream-50 text-charcoal-light border-charcoal/10 hover:bg-cream-100'
-                }`}
-              >
-                <Mail className="w-3.5 h-3.5" />
-                <span>Email</span>
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => setValues({ ...values, preferredContact: 'email' })}
+                  className={`py-2.5 px-2 rounded-xl text-xs font-heading font-bold flex flex-col items-center justify-center gap-1 border transition-all min-h-[44px] ${
+                    values.preferredContact === 'email'
+                      ? 'bg-coral text-white border-coral shadow-sm'
+                      : 'bg-cream-50 text-charcoal-light border-charcoal/10 hover:bg-cream-100'
+                  }`}
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Email</span>
+                </button>
+              </div>
+            </fieldset>
           </div>
         </div>
 
         {/* Message */}
         <div>
-          <label className="block text-sm font-heading font-bold text-charcoal mb-2">
+          <label htmlFor="adm-message" className="block text-sm font-heading font-bold text-charcoal mb-2">
             {f.message}
           </label>
           <textarea
+            id="adm-message"
+            name="message"
             rows={3}
             value={values.message}
             onChange={(e) => setValues({ ...values, message: e.target.value })}
@@ -347,7 +426,7 @@ export const AdmissionForm: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-4 rounded-full bg-coral hover:bg-coral-dark text-white font-heading font-bold text-base shadow-lg shadow-coral/30 hover:shadow-xl hover:shadow-coral/40 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full py-4 rounded-full bg-coral hover:bg-coral-dark text-white font-heading font-bold text-base shadow-lg shadow-coral/30 hover:shadow-xl hover:shadow-coral/40 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed min-h-[48px]"
         >
           {isSubmitting ? (
             <span>{f.submitting}</span>

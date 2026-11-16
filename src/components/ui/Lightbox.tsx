@@ -51,7 +51,8 @@ export const Lightbox: React.FC<LightboxProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Image gallery lightbox"
+      aria-labelledby="lightbox-title"
+      aria-describedby="lightbox-desc"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md transition-opacity duration-300"
       onClick={onClose}
     >
@@ -131,10 +132,10 @@ export const Lightbox: React.FC<LightboxProps> = ({
 
         {/* Caption Panel */}
         <div className="mt-4 text-center max-w-2xl px-4 text-white">
-          <h3 className="text-lg sm:text-xl font-heading font-bold text-yellow-sunshine">
+          <h3 id="lightbox-title" className="text-lg sm:text-xl font-heading font-bold text-yellow-sunshine">
             {currentItem.title[langKey]}
           </h3>
-          <p className="mt-1 text-sm sm:text-base text-white/80 font-body leading-relaxed">
+          <p id="lightbox-desc" className="mt-1 text-sm sm:text-base text-white/80 font-body leading-relaxed">
             {currentItem.description[langKey]}
           </p>
         </div>

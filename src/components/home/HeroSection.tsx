@@ -45,17 +45,16 @@ export const HeroSection: React.FC = () => {
             preload="metadata"
             poster="/images/hero-video-poster.jpg"
             className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
+            aria-label="Little Flowers Preschool children running happily together across courtyard in Makola"
           >
+            <source src="/videos/hero-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
             <source src="/videos/hero-seamless-loop.webm" type="video/webm" />
             <source src="/videos/hero-seamless-loop.mp4" type="video/mp4" />
-            <source src="/videos/hero-mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
-            {/* Fallback image */}
-            <Image
+            {/* Standard HTML5 fallback */}
+            <img
               src="/images/hero-video-poster.jpg"
               alt="Little Flowers Preschool children running in courtyard"
-              fill
-              priority
-              className="object-cover object-center"
+              className="w-full h-full object-cover"
             />
           </video>
         )}
