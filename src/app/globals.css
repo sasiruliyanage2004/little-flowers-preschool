@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-fredoka: 'Fredoka', cursive, sans-serif;
+  --font-nunito: 'Nunito', sans-serif;
+  --font-noto-sinhala: 'Noto Sans Sinhala', sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: #FFF9F0;
+    color: #34333A;
+    font-family: var(--font-nunito), sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Custom selection highlight */
+  ::selection {
+    background-color: #F9DCE5;
+    color: #34333A;
+  }
+}
+
+/* Custom Soft Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF9F0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #F28B78;
+  border-radius: 9999px;
+  border: 2px solid #FFF9F0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D96853;
+}
+
+/* Subtle utility classes */
+.font-sinhala-text {
+  font-family: var(--font-noto-sinhala), sans-serif;
+  line-height: 1.7;
+}
