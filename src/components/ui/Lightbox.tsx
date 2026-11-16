@@ -107,13 +107,16 @@ export const Lightbox: React.FC<LightboxProps> = ({
         <div className="relative w-full h-[55vh] sm:h-[68vh] rounded-2xl overflow-hidden shadow-2xl bg-black/40 flex items-center justify-center">
           {currentItem.videoSrc ? (
             <video
-              src={currentItem.videoSrc}
               controls
               autoPlay
               playsInline
+              preload="metadata"
               className="w-full h-full object-contain"
               poster={currentItem.imageSrc}
-            />
+            >
+              <source src="/videos/preschool-children-running.webm" type="video/webm" />
+              <source src={currentItem.videoSrc} type="video/mp4" />
+            </video>
           ) : (
             <Image
               src={currentItem.originalSrc || currentItem.imageSrc}

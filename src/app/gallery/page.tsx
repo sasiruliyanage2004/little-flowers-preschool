@@ -125,12 +125,16 @@ export default function GalleryPage() {
             <div className="bg-white rounded-4xl overflow-hidden shadow-md border border-charcoal/5 group">
               <div className="relative aspect-video w-full bg-charcoal">
                 <video
-                  src="/videos/preschool-children-running.mp4"
-                  poster="/images/opt-preschool-activity-banner.jpg"
                   controls
                   playsInline
+                  preload="metadata"
+                  poster="/images/opt-preschool-activity-banner.jpg"
                   className="w-full h-full object-cover"
-                />
+                >
+                  <source src="/videos/preschool-children-running.webm" type="video/webm" />
+                  <source src="/videos/preschool-children-running.mp4" type="video/mp4" />
+                  Your browser does not support HTML5 video.
+                </video>
               </div>
               <div className="p-6 sm:p-8">
                 <span className="inline-block px-3 py-1 rounded-full bg-sky-soft text-blue-800 text-xs font-bold uppercase tracking-wider mb-2">

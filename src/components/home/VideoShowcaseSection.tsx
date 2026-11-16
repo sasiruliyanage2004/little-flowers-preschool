@@ -43,14 +43,17 @@ export const VideoShowcaseSection: React.FC = () => {
         <div className="relative max-w-4xl mx-auto rounded-4xl sm:rounded-5xl overflow-hidden shadow-2xl border-4 sm:border-8 border-white bg-charcoal group">
           <video
             ref={videoRef}
-            src="/videos/preschool-children-running.mp4"
             poster="/images/opt-preschool-activity-banner.jpg"
             autoPlay
             loop
             muted={isMuted}
             playsInline
+            preload="metadata"
             className="w-full aspect-[16/9] object-cover"
-          />
+          >
+            <source src="/videos/preschool-children-running.webm" type="video/webm" />
+            <source src="/videos/preschool-children-running.mp4" type="video/mp4" />
+          </video>
 
           {/* Video Control Bar Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20 opacity-90 transition-opacity duration-300 flex flex-col justify-between p-4 sm:p-6">
