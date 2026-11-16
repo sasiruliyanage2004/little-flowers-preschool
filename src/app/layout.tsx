@@ -34,7 +34,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://littleflowerspreschool.lk'),
+  metadataBase: new URL('https://little-flowers-preschool.vercel.app'),
   title: {
     default: 'Little Flowers Preschool | Makola, Sri Lanka (Est. 2010)',
     template: '%s | Little Flowers Preschool',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Little Flowers Preschool | Little Hearts, Big Dreams',
     description:
       'Growing together with love, learning and happiness since 2010 in Makola, Sri Lanka.',
-    url: 'https://littleflowerspreschool.lk',
+    url: 'https://little-flowers-preschool.vercel.app',
     siteName: 'Little Flowers Preschool',
     images: [
       {
