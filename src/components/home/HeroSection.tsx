@@ -1,43 +1,17 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import {
-  ArrowRight,
-  HeartHandshake,
-  Volume2,
-  VolumeX,
-  Play,
-  Pause,
-} from 'lucide-react';
+import { ArrowRight, HeartHandshake } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { FlowerIcon, DaisyIcon } from '@/components/ui/FlowerDeco';
 
 export const HeroSection: React.FC = () => {
   const { t, isSinhala } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(true);
   const prefersReducedMotion = useReducedMotion();
-
-  const toggleSound = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
-
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      videoRef.current.play();
-      setIsPlaying(true);
-    }
-  };
 
   const scrollToNext = () => {
     const el = document.getElementById('established');
@@ -66,7 +40,7 @@ export const HeroSection: React.FC = () => {
             ref={videoRef}
             autoPlay
             loop
-            muted={isMuted}
+            muted
             playsInline
             preload="metadata"
             poster="/images/hero-video-poster.jpg"
@@ -207,30 +181,7 @@ export const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. Unobtrusive Video Playback & Sound Control (Bottom-Right) */}
-      {!prefersReducedMotion && (
-        <div className="absolute bottom-6 right-6 z-20 hidden sm:flex items-center gap-2.5 bg-black/45 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/15 text-white/80 text-xs shadow-lg">
-          <button
-            onClick={toggleSound}
-            aria-label={isMuted ? 'Unmute video audio' : 'Mute video audio'}
-            className="hover:text-white transition-colors"
-            title={isMuted ? 'Unmute' : 'Mute'}
-          >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-yellow-sunshine" />}
-          </button>
-          <span className="w-px h-3 bg-white/25" />
-          <button
-            onClick={togglePlay}
-            aria-label={isPlaying ? 'Pause background video' : 'Play background video'}
-            className="hover:text-white transition-colors"
-            title={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-          </button>
-        </div>
-      )}
-
-      {/* 6. Elegant Scroll-Down Indicator (Bottom-Center) */}
+      {/* 5. Elegant Scroll-Down Indicator (Bottom-Center) */}
       <div className="absolute bottom-5 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center">
         <button
           onClick={scrollToNext}
