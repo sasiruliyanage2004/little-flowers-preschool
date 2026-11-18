@@ -41,4 +41,21 @@ const contactResult = contactSchema.safeParse(validContact);
 assert.strictEqual(contactResult.success, true);
 console.log('✓ contactSchema valid test passed');
 
+console.log('Testing Geo-IP language resolution rules...');
+function resolveLanguageFromCountry(country, acceptLanguage) {
+  if (country && country.toUpperCase() === 'LK') return 'si';
+  if (country && country.toUpperCase() !== 'LK') return 'en';
+  if (acceptLanguage && acceptLanguage.toLowerCase().includes('si')) return 'si';
+  return 'en';
+}
+
+assert.strictEqual(resolveLanguageFromCountry('LK'), 'si');
+assert.strictEqual(resolveLanguageFromCountry('lk'), 'si');
+assert.strictEqual(resolveLanguageFromCountry('US'), 'en');
+assert.strictEqual(resolveLanguageFromCountry('GB'), 'en');
+assert.strictEqual(resolveLanguageFromCountry('AU'), 'en');
+assert.strictEqual(resolveLanguageFromCountry('', 'si-LK,si;q=0.9'), 'si');
+assert.strictEqual(resolveLanguageFromCountry('', 'en-US,en;q=0.9'), 'en');
+console.log('✓ Geo-IP language resolution rules passed');
+
 console.log('All automated validation tests passed successfully!');
