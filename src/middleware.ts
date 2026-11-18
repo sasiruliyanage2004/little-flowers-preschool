@@ -16,9 +16,9 @@ export const config = {
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  // 1. If user already has an explicit language preference cookie, respect it
-  const existingCookie = request.cookies.get('little_flowers_lang')?.value;
-  if (existingCookie === 'en' || existingCookie === 'si') {
+  // 1. If user already made an explicit manual choice, respect it
+  const userChoice = request.cookies.get('lf_user_choice')?.value;
+  if (userChoice === 'en' || userChoice === 'si') {
     return response;
   }
 
@@ -29,21 +29,16 @@ export function middleware(request: NextRequest) {
     request.headers.get('cf-ipcountry') ||
     '';
 
-  let defaultLang: 'en' | 'si' = 'en';
+  let defaultLang: 'en' | 'si' = 'si'; // Default to Sinhala for Little Flowers Preschool
 
-  // If user is accessing from Sri Lanka (LK), default to Sinhala ('si')
-  // If user is accessing from any other country, default to English ('en')
-  if (country.toUpperCase() === 'LK') {
+  // Foreign IPs (US, GB, AU, etc.) default to English
+  if (country && country.toUpperCase() !== 'LK') {
+    defaultLang = 'en';
+  } else if (country && country.toUpperCase() === 'LK') {
     defaultLang = 'si';
-  } else if (!country) {
-    // Fallback: check Accept-Language header for Sinhala
-    const acceptLanguage = request.headers.get('accept-language') || '';
-    if (acceptLanguage.toLowerCase().includes('si')) {
-      defaultLang = 'si';
-    }
   }
 
-  // Set the cookie so client-side hydration and future requests retain this default
+  // Set the cookie so client-side hydration inherits it
   response.cookies.set({
     name: 'little_flowers_lang',
     value: defaultLang,

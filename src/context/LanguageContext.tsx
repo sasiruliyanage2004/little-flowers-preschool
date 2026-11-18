@@ -14,91 +14,101 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'little_flowers_lang';
+// Key explicitly reserved for manual user click overrides
+const USER_CHOICE_KEY = 'lf_user_choice';
+const LEGACY_STORAGE_KEY = 'little_flowers_lang';
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('en');
+  // Default to 'si' (Sinhala) since Little Flowers Preschool is in Makola, Sri Lanka
+  const [language, setLanguageState] = useState<Language>('si');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    let resolvedLang: Language | null = null;
-
-    // 1. Check if user already made an explicit manual choice in localStorage
+    // 1. Wipe out stale legacy keys that were automatically set to 'en' in old builds
     try {
-      const savedLang = localStorage.getItem(STORAGE_KEY) as Language | null;
-      if (savedLang === 'en' || savedLang === 'si') {
-        resolvedLang = savedLang;
+      if (localStorage.getItem(LEGACY_STORAGE_KEY) && !localStorage.getItem(USER_CHOICE_KEY)) {
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
       }
     } catch {
-      // localStorage restricted or unavailable
+      // ignore
     }
 
-    // 2. If no saved choice, check cookie set by Vercel GeoIP Middleware
-    if (!resolvedLang && typeof document !== 'undefined') {
-      try {
-        const cookieMatch = document.cookie.match(
-          new RegExp(`(?:^|;\\s*)${STORAGE_KEY}=([a-zA-Z]+)`)
-        );
-        const cookieVal = cookieMatch ? cookieMatch[1] : null;
-        if (cookieVal === 'en' || cookieVal === 'si') {
-          resolvedLang = cookieVal as Language;
-        }
-      } catch {
-        // ignore
+    // 2. Check if the user has an EXPLICIT manual preference
+    let manualChoice: Language | null = null;
+    try {
+      const saved = localStorage.getItem(USER_CHOICE_KEY) as Language | null;
+      if (saved === 'en' || saved === 'si') {
+        manualChoice = saved;
       }
+    } catch {
+      // ignore
     }
 
-    // 3. If still not resolved, check client timezone (Asia/Colombo indicates Sri Lanka)
-    if (!resolvedLang && typeof Intl !== 'undefined') {
+    if (manualChoice) {
+      setLanguageState(manualChoice);
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = manualChoice;
+      }
+      setMounted(true);
+      return;
+    }
+
+    // 3. No manual user choice: RESOLVE BASED ON TIMEZONE & IP
+    let resolved: Language = 'si';
+
+    // A. Check Client Device TimeZone (Instant, zero latency)
+    // Non-Sri Lanka timezones (e.g. America/*, Europe/*, Australia/*) default to 'en'
+    if (typeof Intl !== 'undefined') {
       try {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (tz === 'Asia/Colombo') {
-          resolvedLang = 'si';
+        if (tz && tz !== 'Asia/Colombo') {
+          resolved = 'en';
+        } else if (tz === 'Asia/Colombo') {
+          resolved = 'si';
         }
       } catch {
         // ignore
       }
     }
 
-    // 4. Check navigator language (e.g. si-LK)
-    if (!resolvedLang && typeof navigator !== 'undefined') {
-      const navLangs = navigator.languages || [navigator.language];
-      if (navLangs.some((l) => l && l.toLowerCase().startsWith('si'))) {
-        resolvedLang = 'si';
+    // B. Check Cookie set by Vercel Edge Middleware
+    if (typeof document !== 'undefined') {
+      try {
+        const cookieMatch = document.cookie.match(
+          /(?:^|;\s*)little_flowers_lang=([a-zA-Z]+)/
+        );
+        if (cookieMatch && (cookieMatch[1] === 'en' || cookieMatch[1] === 'si')) {
+          resolved = cookieMatch[1] as Language;
+        }
+      } catch {
+        // ignore
       }
     }
 
-    // Apply the resolved language (defaults to 'en' if outside Sri Lanka)
-    const initialLang = resolvedLang || 'en';
-    setLanguageState(initialLang);
+    setLanguageState(resolved);
     if (typeof document !== 'undefined') {
-      document.documentElement.lang = initialLang;
+      document.documentElement.lang = resolved;
     }
     setMounted(true);
 
-    // 5. Asynchronous server IP verification if user has never saved a preference
+    // C. Verify with Server-Side Geo-IP endpoint in background
     try {
-      const hasSaved = localStorage.getItem(STORAGE_KEY);
-      if (!hasSaved) {
-        fetch('/api/detect-lang')
-          .then((res) => (res.ok ? res.json() : null))
-          .then((data) => {
-            if (data && (data.language === 'en' || data.language === 'si')) {
-              // If the server-detected language differs and user hasn't explicitly set one, sync it
-              const currentSaved = localStorage.getItem(STORAGE_KEY);
-              if (!currentSaved && data.language !== initialLang) {
-                setLanguageState(data.language);
-                if (typeof document !== 'undefined') {
-                  document.documentElement.lang = data.language;
-                  document.cookie = `${STORAGE_KEY}=${data.language}; path=/; max-age=31536000; SameSite=Lax`;
-                }
+      fetch('/api/detect-lang')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && (data.language === 'en' || data.language === 'si')) {
+            const hasManual = localStorage.getItem(USER_CHOICE_KEY);
+            if (!hasManual && data.language !== resolved) {
+              setLanguageState(data.language);
+              if (typeof document !== 'undefined') {
+                document.documentElement.lang = data.language;
               }
             }
-          })
-          .catch(() => {
-            // silent fallback
-          });
-      }
+          }
+        })
+        .catch(() => {
+          // ignore
+        });
     } catch {
       // ignore
     }
@@ -107,10 +117,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     try {
-      localStorage.setItem(STORAGE_KEY, lang);
+      // Save explicit user choice so it takes precedence over Geo-IP
+      localStorage.setItem(USER_CHOICE_KEY, lang);
+      localStorage.setItem(LEGACY_STORAGE_KEY, lang);
       if (typeof document !== 'undefined') {
         document.documentElement.lang = lang;
-        document.cookie = `${STORAGE_KEY}=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+        document.cookie = `lf_user_choice=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+        document.cookie = `little_flowers_lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
       }
     } catch {
       // ignore
@@ -121,9 +134,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLanguage(language === 'en' ? 'si' : 'en');
   };
 
-  // If not mounted yet, default 'en' during SSR to prevent hydration mismatch
-  const currentLang = mounted ? language : 'en';
-  const t = translations[currentLang] || translations.en;
+  // During SSR or before mount, use 'si' (Sinhala) as primary preschool locale
+  const currentLang = mounted ? language : 'si';
+  const t = translations[currentLang] || translations.si;
   const isSinhala = currentLang === 'si';
 
   return (
