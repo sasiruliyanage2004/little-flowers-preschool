@@ -118,20 +118,38 @@ export const ContactForm: React.FC = () => {
             ? 'අපගේ ප්‍රධාන ආචාරිණිය හෝ කාර්ය මණ්ඩලය ඉක්මනින් ඔබ අමතනු ඇත.'
             : 'Our preschool team will review your enquiry and respond to you promptly.'}
         </p>
-        <button
-          type="button"
-          onClick={() => {
-            setName('');
-            setPhone('');
-            setSubject('');
-            setMessage('');
-            setServerError(null);
-            setIsSent(false);
-          }}
-          className="px-6 py-3 rounded-full bg-cream text-charcoal font-heading font-bold text-sm hover:bg-cream-100 transition-colors min-h-[44px]"
-        >
-          {isSinhala ? 'තවත් පණිවිඩයක් එවන්න' : 'Send Another Message'}
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a
+            href={`https://wa.me/94719606126?text=${encodeURIComponent(
+              `🌸 *Little Flowers Preschool - Direct Message*\n\n` +
+              `👤 *Name:* ${name}\n` +
+              `📞 *Phone:* ${phone}\n` +
+              (subject ? `📌 *Subject:* ${subject}\n` : '') +
+              `💬 *Message:* ${message}`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-sm shadow-md transition-all transform hover:scale-105 active:scale-95 min-h-[44px]"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>{isSinhala ? 'WhatsApp මගින් පණිවිඩය යවන්න' : 'Send via WhatsApp'}</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={() => {
+              setName('');
+              setPhone('');
+              setSubject('');
+              setMessage('');
+              setServerError(null);
+              setIsSent(false);
+            }}
+            className="px-6 py-3 rounded-full bg-cream text-charcoal font-heading font-bold text-sm hover:bg-cream-100 transition-colors min-h-[44px]"
+          >
+            {isSinhala ? 'තවත් පණිවිඩයක් එවන්න' : 'Send Another Message'}
+          </button>
+        </div>
       </div>
     );
   }

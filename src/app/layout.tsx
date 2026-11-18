@@ -1,16 +1,16 @@
 import type { Metadata, Viewport } from 'next';
-import { Fredoka, Nunito, Noto_Sans_Sinhala } from 'next/font/google';
+import { Outfit, Nunito, Noto_Sans_Sinhala } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { schoolInfo } from '@/data/siteContent';
 
-const fredoka = Fredoka({
+const outfit = Outfit({
   subsets: ['latin'],
-  variable: '--font-fredoka',
+  variable: '--font-outfit',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
 });
 
 const nunito = Nunito({
@@ -121,7 +121,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${fredoka.variable} ${nunito.variable} ${notoSinhala.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${nunito.variable} ${notoSinhala.variable}`}>
       <head>
         <script
           type="application/ld+json"

@@ -178,14 +178,23 @@ export const AdmissionForm: React.FC = () => {
         <div className="flex flex-wrap items-center justify-center gap-4">
           <a
             href={`https://wa.me/94719606126?text=${encodeURIComponent(
-              `Hello Little Flowers Preschool, I just submitted enquiry ${submissionId} for ${values.parentName} (Child: ${values.childName || 'Not specified'}).`
+              `🌸 *Little Flowers Preschool - Admission Enquiry*\n` +
+              `Ref: ${submissionId}\n\n` +
+              `👤 *Parent / Guardian:* ${values.parentName}\n` +
+              `📞 *Contact Number:* ${values.contactNumber}\n` +
+              (values.email ? `✉️ *Email:* ${values.email}\n` : '') +
+              (values.childName ? `👶 *Child's Name:* ${values.childName}\n` : '') +
+              (values.childAge ? `🎂 *Child's Age:* ${values.childAge}\n` : '') +
+              `📅 *Desired Year:* ${values.desiredYear}\n` +
+              `💬 *Preferred Contact:* ${values.preferredContact}\n` +
+              (values.message ? `📝 *Notes:* ${values.message}\n` : '')
             )}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-sm shadow-md transition-all transform hover:scale-105 active:scale-95 min-h-[44px]"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>{isSinhala ? 'WhatsApp ඔස්සේ තහවුරු කරන්න' : 'Confirm via WhatsApp'}</span>
+            <span>{isSinhala ? 'WhatsApp ඔස්සේ විස්තර එවන්න' : 'Send Details via WhatsApp'}</span>
           </a>
 
           <button

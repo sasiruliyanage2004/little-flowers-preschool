@@ -49,7 +49,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        heading: ["var(--font-fredoka)", "sans-serif"],
+        heading: ["var(--font-outfit)", "sans-serif"],
         body: ["var(--font-nunito)", "sans-serif"],
         sinhala: ["var(--font-noto-sinhala)", "sans-serif"],
       },

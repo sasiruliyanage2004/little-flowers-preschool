@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --font-fredoka: 'Fredoka', cursive, sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
   --font-nunito: 'Nunito', sans-serif;
   --font-noto-sinhala: 'Noto Sans Sinhala', sans-serif;
 }
