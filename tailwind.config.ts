@@ -49,8 +49,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        heading: ["var(--font-outfit)", "sans-serif"],
-        body: ["var(--font-nunito)", "sans-serif"],
+        heading: ["var(--font-outfit)", "var(--font-noto-sinhala)", "sans-serif"],
+        body: ["var(--font-nunito)", "var(--font-noto-sinhala)", "sans-serif"],
         sinhala: ["var(--font-noto-sinhala)", "sans-serif"],
       },
       borderRadius: {

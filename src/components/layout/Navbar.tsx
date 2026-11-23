@@ -66,9 +66,11 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3.5 py-2 rounded-full text-sm font-heading font-medium transition-all duration-200 ${
+                  className={`whitespace-nowrap px-3 xl:px-3.5 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm transition-all duration-200 ${
+                    isSinhala ? 'font-sinhala font-medium' : 'font-heading font-medium'
+                  } ${
                     isActive
-                      ? 'bg-coral text-white shadow-sm'
+                      ? 'bg-coral text-white shadow-sm font-bold'
                       : isHeroTransparent
                       ? 'text-white/90 hover:text-white hover:bg-white/20'
                       : 'text-charcoal-light hover:text-charcoal hover:bg-white/80'
@@ -81,7 +83,7 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Actions & Language Switcher */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2 xl:gap-3 shrink-0">
             <LanguageSwitcher />
 
             <a
@@ -99,9 +101,11 @@ export const Navbar: React.FC = () => {
 
             <Link
               href="/admissions"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-coral text-white font-heading font-bold text-sm shadow-md hover:bg-coral-dark hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
+              className={`whitespace-nowrap inline-flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-full bg-coral text-white ${
+                isSinhala ? 'font-sinhala font-bold' : 'font-heading font-bold'
+              } text-xs xl:text-sm shadow-md hover:bg-coral-dark hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 shrink-0`}
             >
-              <HeartHandshake className="w-4 h-4" />
+              <HeartHandshake className="w-4 h-4 shrink-0" />
               <span>{t.nav.enquireNow}</span>
             </Link>
           </div>
@@ -140,7 +144,9 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-3 rounded-2xl text-base font-heading font-semibold transition-colors ${
+                  className={`px-4 py-3 rounded-2xl text-base ${
+                    isSinhala ? 'font-sinhala font-semibold' : 'font-heading font-semibold'
+                  } transition-colors ${
                     isActive
                       ? 'bg-coral text-white shadow-sm'
                       : 'text-charcoal hover:bg-white hover:text-coral'
@@ -154,7 +160,9 @@ export const Navbar: React.FC = () => {
             <div className="pt-4 mt-2 border-t border-charcoal/10 flex flex-col gap-3">
               <Link
                 href="/admissions"
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-coral text-white font-heading font-bold shadow-md hover:bg-coral-dark"
+                className={`w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-coral text-white ${
+                  isSinhala ? 'font-sinhala font-bold' : 'font-heading font-bold'
+                } shadow-md hover:bg-coral-dark`}
               >
                 <HeartHandshake className="w-5 h-5" />
                 <span>{t.nav.enquireNow}</span>
