@@ -104,6 +104,16 @@ export function AboutView() {
             {/* Authentic Photograph */}
             <div className="lg:col-span-5">
               <div className="relative rounded-4xl overflow-hidden shadow-2xl border-8 border-white bg-white aspect-[4/3] group">
+                {/* School Seal Badge */}
+                <div className="absolute top-4 left-4 z-10 w-14 h-14 rounded-full overflow-hidden shadow-xl ring-2 ring-white/90 bg-[#C3986B]">
+                  <Image
+                    src="/images/little-flowers-logo-badge.png"
+                    alt="Official Little Flowers Preschool Emblem"
+                    width={56}
+                    height={56}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <Image
                   src="/images/opt-children-play-smiles.jpg"
                   alt="Little Flowers Preschool children in Makola"

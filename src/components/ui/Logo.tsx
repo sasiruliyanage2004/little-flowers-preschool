@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface LogoProps {
   className?: string;
@@ -16,14 +17,20 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   const iconSizes = {
     sm: 'w-8 h-8',
-    md: 'w-10 h-10',
-    lg: 'w-14 h-14',
+    md: 'w-10 h-10 md:w-11 md:h-11',
+    lg: 'w-14 h-14 md:w-16 md:h-16',
+  };
+
+  const imagePixelSizes = {
+    sm: 32,
+    md: 44,
+    lg: 64,
   };
 
   const textSizes = {
-    sm: 'text-lg',
-    md: 'text-xl md:text-2xl',
-    lg: 'text-2xl md:text-3xl',
+    sm: 'text-base font-extrabold',
+    md: 'text-lg md:text-xl font-extrabold',
+    lg: 'text-2xl md:text-3xl font-extrabold',
   };
 
   const subTextSizes = {
@@ -35,55 +42,29 @@ export const Logo: React.FC<LogoProps> = ({
   return (
     <Link
       href="/"
-      className={`inline-flex items-center gap-3 group select-none transition-transform duration-200 active:scale-95 ${className}`}
+      className={`inline-flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-200 active:scale-95 shrink-0 ${className}`}
       aria-label="Little Flowers Preschool Homepage"
     >
-      {/* Flower Emblem */}
-      <div className={`relative flex-shrink-0 ${iconSizes[size]} transition-transform duration-300 group-hover:rotate-12`}>
-        <svg
-          viewBox="0 0 100 100"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full drop-shadow-sm"
-        >
-          {/* Flower Petals */}
-          {/* Top Petal - Coral */}
-          <ellipse cx="50" cy="24" rx="14" ry="19" fill="#F28B78" />
-          {/* Right Top Petal - Sunshine Yellow */}
-          <ellipse cx="74" cy="38" rx="14" ry="19" transform="rotate(72 74 38)" fill="#FFD66B" />
-          {/* Right Bottom Petal - Soft Pink */}
-          <ellipse cx="65" cy="73" rx="14" ry="19" transform="rotate(144 65 73)" fill="#F9DCE5" />
-          {/* Left Bottom Petal - Sky Blue */}
-          <ellipse cx="35" cy="73" rx="14" ry="19" transform="rotate(216 35 73)" fill="#D9ECFA" />
-          {/* Left Top Petal - Mint */}
-          <ellipse cx="26" cy="38" rx="14" ry="19" transform="rotate(288 26 38)" fill="#CBE8D5" />
-          
-          {/* Gentle Stem Leaf */}
-          <path
-            d="M50 72 C58 78, 62 88, 55 94 C46 95, 42 85, 50 72Z"
-            fill="#8EC6A0"
-          />
-
-          {/* Center Pistil - Warm Gold */}
-          <circle cx="50" cy="50" r="16" fill="#FFF9F0" />
-          <circle cx="50" cy="50" r="12" fill="#E8B838" />
-          
-          {/* Smiling Center Eyes & Smile */}
-          <circle cx="46" cy="48" r="1.8" fill="#34333A" />
-          <circle cx="54" cy="48" r="1.8" fill="#34333A" />
-          <path
-            d="M46 53 Q50 56 54 53"
-            stroke="#34333A"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
+      {/* Official School Emblem Badge */}
+      <div
+        className={`relative flex-shrink-0 ${iconSizes[size]} rounded-full overflow-hidden shadow-sm ring-2 ${
+          isWhite ? 'ring-white/80 shadow-md' : 'ring-coral/40 group-hover:ring-coral shadow-sm'
+        } transition-all duration-300 group-hover:scale-105 bg-[#C3986B]`}
+      >
+        <Image
+          src="/images/little-flowers-logo-badge.png"
+          alt="Little Flowers Preschool Official Logo Emblem"
+          width={imagePixelSizes[size]}
+          height={imagePixelSizes[size]}
+          priority
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Brand Typographic Wordmark */}
       <div className="flex flex-col leading-tight">
         <span
-          className={`font-heading font-bold tracking-tight transition-colors duration-200 ${
+          className={`font-heading tracking-tight transition-colors duration-200 ${
             isWhite ? 'text-white' : 'text-charcoal group-hover:text-coral'
           } ${textSizes[size]}`}
         >
@@ -92,17 +73,21 @@ export const Logo: React.FC<LogoProps> = ({
         <div className="flex items-center gap-1.5 font-bold uppercase">
           <span
             className={`${
-              isWhite ? 'text-white/80' : 'text-coral-dark'
+              isWhite ? 'text-white/85' : 'text-coral-dark'
             } ${subTextSizes[size]}`}
           >
             Preschool
           </span>
           {showEst && (
             <>
-              <span className={`inline-block w-1 h-1 rounded-full ${isWhite ? 'bg-white/40' : 'bg-charcoal/30'}`} />
+              <span
+                className={`inline-block w-1 h-1 rounded-full ${
+                  isWhite ? 'bg-white/50' : 'bg-charcoal/30'
+                }`}
+              />
               <span
                 className={`font-semibold ${
-                  isWhite ? 'text-white/70' : 'text-charcoal-muted'
+                  isWhite ? 'text-white/75' : 'text-charcoal-muted'
                 } ${subTextSizes[size]}`}
               >
                 Est. 2010
