@@ -92,7 +92,15 @@ export const HeroSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 shadow-md mb-5 sm:mb-6"
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-yellow-sunshine animate-pulse shrink-0" />
+            <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 ring-1 ring-white/60 bg-[#C3986B]">
+              <Image
+                src="/images/little-flowers-logo-badge.png"
+                alt="Logo"
+                width={20}
+                height={20}
+                className="w-full h-full object-cover"
+              />
+            </div>
             <span className="text-xs sm:text-sm font-heading font-extrabold uppercase tracking-widest text-white">
               {isSinhala
                 ? 'ලිට්ල් ෆ්ලවර්ස් පෙර පාසල • EST. 2010'
