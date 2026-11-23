@@ -1,4 +1,5 @@
 import { HeroSection } from '@/components/home/HeroSection';
+import { AdmissionsCampaignSection } from '@/components/home/AdmissionsCampaignSection';
 import { EstablishedSection } from '@/components/home/EstablishedSection';
 import { WelcomeSection } from '@/components/home/WelcomeSection';
 import { VisionMissionSection } from '@/components/home/VisionMissionSection';
@@ -12,6 +13,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <AdmissionsCampaignSection />
       <EstablishedSection />
       <WelcomeSection />
       <VisionMissionSection />

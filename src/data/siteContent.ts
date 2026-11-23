@@ -43,6 +43,62 @@ export const schoolInfo: SchoolInfo = {
   },
 };
 
+export const admissions2027Campaign = {
+  year: '2027',
+  isActive: true,
+  establishedYear: 2010,
+  deadline: '2026-12-31',
+  deadlineDisplay: {
+    en: '31 December 2026',
+    si: '2026 දෙසැම්බර් 31',
+  },
+  collectionDays: {
+    en: 'Weekdays only',
+    si: 'සතියේ දිනවල පමණි',
+  },
+  collectionTime: {
+    en: '10:00 AM – 12:00 PM',
+    si: 'පෙ.ව. 10.00 – මධ්‍යහ්න 12.00',
+  },
+  address: {
+    en: '96/2, Makola South, Makola, Sri Lanka',
+    si: '96/2, මාකොළ දකුණ, මාකොළ, ශ්‍රී ලංකාව',
+  },
+  phone: '+94719606126',
+  phoneDisplay: '071 960 6126',
+  googleMapsUrl: 'https://share.google/v0ygYpIB2YPst12Nd',
+  posterImage: '/images/little-flowers-admissions-2027.jpeg',
+  optimizedPosterImage: '/images/opt-little-flowers-admissions-2027.jpg',
+  posterWidth: 4160,
+  posterHeight: 2496,
+  specialOffer: {
+    title: {
+      en: 'Special Admission Offer',
+      si: 'සුවිශේෂී ඇතුළත් වීමේ දීමනාව',
+    },
+    badge: {
+      en: 'FREE ADMISSION',
+      si: 'ඇතුළත් වීමේ ගාස්තු නොමිලේ',
+    },
+    highlight: {
+      en: 'Admission Fee FREE for the First 15 Children!',
+      si: 'පළමු දරුවන් 15 දෙනා සඳහා ඇතුළත් වීමේ ගාස්තු නොමිලේ!',
+    },
+    condition: {
+      en: 'Applicable for children enrolling for the full 2-year early childhood programme up to 31 December 2026.',
+      si: 'අවුරුදු දෙකම ඉගෙනුම ලබන දරුවන් සඳහා පමණි (දෙසැම්බර් 31 දක්වා ඇතුළත් වන අයට පමණි).',
+    },
+  },
+  whatsappPrefill: {
+    en: 'Hello Little Flowers Preschool, I would like to know more about the 2027 admissions. Could you please provide further information?',
+    si: 'ආයුබෝවන්, Little Flowers Preschool 2027 නවක සිසුන් ඇතුළත් කිරීම පිළිබඳ වැඩි විස්තර දැනගැනීමට කැමතියි.',
+  },
+  getWhatsappUrl(lang: 'en' | 'si' = 'si') {
+    const msg = lang === 'si' ? this.whatsappPrefill.si : this.whatsappPrefill.en;
+    return `https://wa.me/94719606126?text=${encodeURIComponent(msg)}`;
+  },
+};
+
 export const officialStatements = {
   vision: {
     si: `සෞභාග්ය සම්පන්න වූද,

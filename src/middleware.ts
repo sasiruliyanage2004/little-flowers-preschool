@@ -16,39 +16,42 @@ export const config = {
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  // 1. If user already made an explicit manual choice, respect it
-  const userChoice = request.cookies.get('lf_user_choice')?.value;
-  if (userChoice === 'en' || userChoice === 'si') {
-    return response;
-  }
-
-  // 2. Detect country from Vercel Edge Geolocation headers
+  // 1. Detect country from Vercel Edge Geolocation headers
   const country =
     request.geo?.country ||
     request.headers.get('x-vercel-ip-country') ||
     request.headers.get('cf-ipcountry') ||
     '';
 
-  let defaultLang: 'en' | 'si' = 'si'; // Default to Sinhala for Little Flowers Preschool
+  const normalized = country ? country.toUpperCase().trim() : '';
+  const isForeign = normalized !== '' && normalized !== 'LK';
+  const geoLang: 'en' | 'si' = isForeign ? 'en' : 'si';
 
-  // Foreign IPs (US, GB, AU, etc.) default to English
-  if (country && country.toUpperCase() !== 'LK') {
-    defaultLang = 'en';
-  } else if (country && country.toUpperCase() === 'LK') {
-    defaultLang = 'si';
+  // 2. Check if user made an active session choice in this browser session
+  const sessionChoice = request.cookies.get('lf_session_lang')?.value;
+  if (sessionChoice === 'en' || sessionChoice === 'si') {
+    response.headers.set('x-detected-country', normalized || (isForeign ? 'foreign' : 'LK'));
+    response.headers.set('x-detected-lang', sessionChoice);
+    return response;
   }
 
-  // Set the cookie so client-side hydration inherits it
+  // 3. Clear legacy persistent 1-year lock cookies that might have been stuck on 'en'
+  const legacyChoice = request.cookies.get('lf_user_choice')?.value;
+  if (legacyChoice && !isForeign) {
+    response.cookies.delete('lf_user_choice');
+  }
+
+  // 4. Set the fresh cookie based on IP geolocation
   response.cookies.set({
     name: 'little_flowers_lang',
-    value: defaultLang,
+    value: geoLang,
     path: '/',
-    maxAge: 60 * 60 * 24 * 365, // 1 year
+    maxAge: 60 * 60 * 24 * 7, // 7 days
     sameSite: 'lax',
   });
 
-  response.headers.set('x-detected-country', country || 'unknown');
-  response.headers.set('x-detected-lang', defaultLang);
+  response.headers.set('x-detected-country', normalized || (isForeign ? 'foreign' : 'LK'));
+  response.headers.set('x-detected-lang', geoLang);
 
   return response;
 }

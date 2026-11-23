@@ -14,7 +14,7 @@ export const HeroSection: React.FC = () => {
   const prefersReducedMotion = useReducedMotion();
 
   const scrollToNext = () => {
-    const el = document.getElementById('established');
+    const el = document.getElementById('admissions-2027') || document.getElementById('established');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     } else {

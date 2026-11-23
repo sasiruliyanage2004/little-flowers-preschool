@@ -12,25 +12,41 @@ export async function GET(req: NextRequest) {
     req.headers.get('cf-ipcountry') ||
     '';
 
+  const normalized = country ? country.toUpperCase().trim() : '';
   const acceptLanguage = req.headers.get('accept-language') || '';
-  const isSriLanka = country.toUpperCase() === 'LK';
 
-  // If Sri Lankan IP -> 'si', else if foreign -> 'en', else check Accept-Language
-  let language: 'en' | 'si' = isSriLanka ? 'si' : 'en';
+  // Sri Lanka -> 'si'
+  // Foreign country (US, GB, AU, CA, etc.) -> 'en'
+  // Unknown / Missing -> 'si' (Little Flowers Preschool in Makola, Sri Lanka)
+  let language: 'en' | 'si' = 'si';
+  let isSriLanka = true;
 
-  if (!country && acceptLanguage.toLowerCase().includes('si')) {
+  if (normalized && normalized !== 'LK') {
+    language = 'en';
+    isSriLanka = false;
+  } else if (normalized === 'LK') {
     language = 'si';
+    isSriLanka = true;
+  } else {
+    // When no geo header is available (e.g., localhost or certain proxies)
+    if (acceptLanguage && !acceptLanguage.toLowerCase().includes('si') && acceptLanguage.toLowerCase().includes('en-us')) {
+      language = 'en';
+      isSriLanka = false;
+    } else {
+      language = 'si';
+      isSriLanka = true;
+    }
   }
 
   return NextResponse.json(
     {
-      country: country || 'unknown',
+      country: normalized || (isSriLanka ? 'LK' : 'unknown'),
       isSriLanka,
       language,
     },
     {
       headers: {
-        'Cache-Control': 'no-store, max-age=0',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
       },
     }
   );
