@@ -83,14 +83,16 @@ export const HeroSection: React.FC = () => {
       </div>
 
       {/* 4. Left-Aligned Editorial Content with Staggered Entrance Animations */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full pt-16 sm:pt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full pt-16 sm:pt-20 pb-20 sm:pb-24">
         <div className="max-w-2xl lg:max-w-3xl flex flex-col items-start text-left">
           {/* Badge: Brand Name & Established 2010 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 shadow-md mb-5 sm:mb-6"
+            className={`inline-flex items-center gap-2.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 shadow-md ${
+              isSinhala ? 'mb-3 sm:mb-4' : 'mb-5 sm:mb-6'
+            }`}
           >
             <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 ring-1 ring-white/60 bg-[#C3986B]">
               <Image
@@ -101,7 +103,11 @@ export const HeroSection: React.FC = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className="text-xs sm:text-sm font-heading font-extrabold uppercase tracking-widest text-white">
+            <span
+              className={`text-xs sm:text-sm uppercase tracking-widest text-white ${
+                isSinhala ? 'font-sinhala font-bold tracking-normal' : 'font-heading font-extrabold'
+              }`}
+            >
               {isSinhala
                 ? 'ලිට්ල් ෆ්ලවර්ස් පෙර පාසල • EST. 2010'
                 : 'LITTLE FLOWERS PRESCHOOL • EST. 2010'}
@@ -113,12 +119,14 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.25 }}
-            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-heading font-extrabold text-white tracking-tight leading-[1.12] drop-shadow-lg"
+            className={`font-heading font-extrabold text-white drop-shadow-lg ${
+              isSinhala
+                ? 'text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] xl:text-[3.6rem] font-sinhala leading-[1.2] tracking-normal max-w-2xl'
+                : 'text-4xl sm:text-5xl lg:text-6xl xl:text-7xl tracking-tight leading-[1.12]'
+            }`}
           >
             {isSinhala ? (
-              <span className="font-sinhala leading-normal">
-                {t.hero.headline}
-              </span>
+              <span>{t.hero.headline}</span>
             ) : (
               <>
                 Little Hearts,{' '}
@@ -147,7 +155,11 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4 }}
-            className="mt-4 sm:mt-5 text-xl sm:text-2xl lg:text-3xl font-heading font-bold text-coral-light leading-snug drop-shadow-md"
+            className={`font-heading font-bold text-coral-light drop-shadow-md ${
+              isSinhala
+                ? 'mt-2.5 sm:mt-3 text-base sm:text-lg lg:text-xl xl:text-2xl font-sinhala leading-snug'
+                : 'mt-4 sm:mt-5 text-xl sm:text-2xl lg:text-3xl leading-snug'
+            }`}
           >
             {t.hero.subheadline}
           </motion.h2>
@@ -157,7 +169,11 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.55 }}
-            className="mt-4 sm:mt-5 text-base sm:text-lg lg:text-xl text-white/90 font-body leading-relaxed max-w-2xl drop-shadow"
+            className={`text-white/90 leading-relaxed drop-shadow ${
+              isSinhala
+                ? 'mt-2.5 sm:mt-3 text-xs sm:text-sm lg:text-base font-sinhala max-w-xl text-white/85'
+                : 'mt-4 sm:mt-5 text-base sm:text-lg lg:text-xl font-body max-w-2xl'
+            }`}
           >
             {t.hero.description}
           </motion.p>
@@ -167,20 +183,30 @@ export const HeroSection: React.FC = () => {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.7 }}
-            className="mt-8 sm:mt-10 flex flex-wrap items-center gap-4 w-full sm:w-auto"
+            className={`flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto ${
+              isSinhala ? 'mt-5 sm:mt-6' : 'mt-8 sm:mt-10'
+            }`}
           >
             <Link
               href="/admissions"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-coral text-white font-heading font-bold text-base shadow-xl shadow-coral/40 hover:bg-coral-dark hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
+              className={`w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-full bg-coral text-white font-bold shadow-xl shadow-coral/40 hover:bg-coral-dark hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 ${
+                isSinhala
+                  ? 'px-6 sm:px-7 py-3 sm:py-3.5 text-xs sm:text-sm font-sinhala'
+                  : 'px-8 py-4 text-base font-heading'
+              }`}
             >
-              <HeartHandshake className="w-5 h-5" />
+              <HeartHandshake className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
               <span>{isSinhala ? 'ඇතුළත් කිරීම් විමසන්න' : 'Enquire Now'}</span>
-              <ArrowRight className="w-5 h-5 ml-1" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1 shrink-0" />
             </Link>
 
             <button
               onClick={scrollToNext}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white/15 backdrop-blur-md text-white font-heading font-bold text-base border-2 border-white/40 hover:bg-white/25 hover:border-white shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
+              className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-white/15 backdrop-blur-md text-white font-bold border-2 border-white/40 hover:bg-white/25 hover:border-white shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 ${
+                isSinhala
+                  ? 'px-6 sm:px-7 py-3 sm:py-3.5 text-xs sm:text-sm font-sinhala'
+                  : 'px-7 py-4 text-base font-heading'
+              }`}
             >
               <span>{isSinhala ? 'අපේ පෙරපාසල හඳුනාගන්න' : 'Discover Our Preschool'}</span>
             </button>
